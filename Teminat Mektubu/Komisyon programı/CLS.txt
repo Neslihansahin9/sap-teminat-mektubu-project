@@ -1,0 +1,450 @@
+*&---------------------------------------------------------------------*
+*& Include          ZFI_R_KOMISYON_I_CLS
+*&---------------------------------------------------------------------*
+
+CLASS lcl_main DEFINITION.
+  PUBLIC SECTION.
+    CLASS-DATA:
+      mt_alv  TYPE TABLE OF zfi_t_komisyon,
+      mo_grid TYPE REF TO cl_gui_alv_grid,
+      mt_fcat TYPE lvc_t_fcat,
+      ms_layo TYPE lvc_s_layo,
+      ms_vari TYPE disvariant,
+      mo_dock TYPE REF TO cl_gui_docking_container,
+      ms_stbl TYPE lvc_s_stbl VALUE 'XX'.
+    CONSTANTS:
+      mc_strc     TYPE tabname VALUE 'ZFI_T_KOMISYON',
+      mc_itabname TYPE tabname VALUE 'MT_ALV',
+      mc_datastr  TYPE boolean_flg VALUE 'X'.
+
+    CLASS-METHODS:
+      initialization,
+      selection_screen_output,
+      start_of_selection,
+      end_of_selection,
+      selection_screen,
+      get_data,
+      display,
+      fieldcat                IMPORTING iv_strucname       TYPE tabname
+                                        iv_itabname        TYPE tabname
+                              CHANGING  REFERENCE(ct_fcat) TYPE lvc_t_fcat,
+
+      layout                  CHANGING  REFERENCE(cs_layo) TYPE lvc_s_layo,
+
+      variant                 IMPORTING REFERENCE(iv_handl)   TYPE slis_handl
+                              CHANGING  REFERENCE(cs_variant) TYPE disvariant,
+
+      get_selected_rows       IMPORTING REFERENCE(iv_grid)     TYPE REF TO cl_gui_alv_grid
+                                        REFERENCE(iv_one_line) TYPE abap_bool OPTIONAL
+                              RETURNING VALUE(rt_rows)         TYPE lvc_t_row,
+
+      refresh_table_display   IMPORTING iv_grid TYPE REF TO cl_gui_alv_grid
+                                        is_layo TYPE        lvc_s_layo OPTIONAL
+                                        it_fcat TYPE        lvc_t_fcat OPTIONAL,
+
+      exclude_buttons         RETURNING VALUE(rv_buttons) TYPE ui_functions,
+      status_0100,
+      user_command_0100.
+ENDCLASS.
+
+CLASS lcl_main IMPLEMENTATION.
+  METHOD initialization.
+
+  ENDMETHOD.
+  METHOD selection_screen_output.
+
+  ENDMETHOD.
+  METHOD selection_screen.
+
+  ENDMETHOD.
+  METHOD start_of_selection.
+    get_data( ).
+  ENDMETHOD.
+  METHOD end_of_selection.
+    CALL SCREEN 100.
+  ENDMETHOD.
+  METHOD get_data.
+
+    IF s_tarih IS NOT INITIAL AND s_yil IS NOT INITIAL.
+      IF s_bukrs IS INITIAL AND s_banka IS INITIAL.
+
+        SELECT *
+          FROM zfi_t_komisyon
+          INTO CORRESPONDING FIELDS OF TABLE @mt_alv
+          WHERE tarih IN @s_tarih AND
+                yil   IN @s_yil.
+
+      ELSEIF s_bukrs IS NOT INITIAL AND s_banka IS INITIAL.
+
+        SELECT *
+          FROM zfi_t_komisyon
+          INTO CORRESPONDING FIELDS OF TABLE @mt_alv
+          WHERE tarih IN @s_tarih AND
+                yil   IN @s_yil   AND
+                bukrs IN @s_bukrs.
+
+      ELSEIF s_bukrs IS INITIAL AND s_banka IS NOT INITIAL.
+
+        SELECT *
+          FROM zfi_t_komisyon
+          INTO CORRESPONDING FIELDS OF TABLE @mt_alv
+          WHERE tarih IN @s_tarih AND
+                yil   IN @s_yil   AND
+                banka IN @s_banka.
+
+      ELSE.
+
+        SELECT *
+           FROM zfi_t_komisyon
+          INTO CORRESPONDING FIELDS OF TABLE @mt_alv
+          WHERE tarih IN @s_tarih AND
+                yil   IN @s_yil   AND
+                bukrs IN @s_bukrs AND
+                banka IN @s_banka.
+
+      ENDIF.
+    ELSE.
+      MESSAGE |Tarih ve yıl alanları doldurulmalıdır!| TYPE 'S'.
+    ENDIF.
+
+  ENDMETHOD.
+  METHOD get_selected_rows.
+    iv_grid->get_selected_rows(
+      IMPORTING
+        et_index_rows = rt_rows
+        et_row_no     = DATA(lt_row_no)
+    ).
+    IF rt_rows IS INITIAL.
+      MESSAGE TEXT-m02 TYPE 'S' DISPLAY LIKE 'E'.
+    ELSEIF iv_one_line EQ abap_true AND lines( rt_rows ) GT 1.
+      MESSAGE TEXT-m03 TYPE 'S' DISPLAY LIKE 'E'.
+      FREE rt_rows.
+    ENDIF.
+  ENDMETHOD.
+  METHOD display.
+    IF mo_dock IS INITIAL.
+      CREATE OBJECT mo_dock
+        EXPORTING
+          side                        = cl_gui_docking_container=>dock_at_top
+          extension                   = 99999
+          caption                     = 'Header'
+        EXCEPTIONS
+          cntl_error                  = 1
+          cntl_system_error           = 2
+          create_error                = 3
+          lifetime_error              = 4
+          lifetime_dynpro_dynpro_link = 5
+          OTHERS                      = 6.
+      IF sy-subrc <> 0.
+        MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+                  WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+      ENDIF.
+
+      CREATE OBJECT mo_grid
+        EXPORTING
+          i_parent = mo_dock.
+
+      DATA(lt_buttons) = exclude_buttons( ).
+
+      fieldcat( EXPORTING iv_strucname = mc_strc
+                          iv_itabname  = mc_itabname
+                CHANGING  ct_fcat      = mt_fcat ).
+
+      layout( CHANGING cs_layo = ms_layo ).
+
+      variant( EXPORTING iv_handl   = 'MAIN'
+               CHANGING  cs_variant = ms_vari ).
+
+      CALL METHOD mo_grid->set_table_for_first_display
+        EXPORTING
+          is_layout            = ms_layo
+          it_toolbar_excluding = lt_buttons
+          is_variant           = ms_vari
+          i_save               = 'A'
+        CHANGING
+          it_fieldcatalog      = mt_fcat[]
+          it_outtab            = mt_alv[].
+
+      CALL METHOD mo_grid->set_toolbar_interactive.
+      CALL METHOD mo_grid->refresh_table_display.
+      CALL METHOD mo_grid->register_edit_event
+        EXPORTING
+          i_event_id = cl_gui_alv_grid=>mc_evt_modified.
+
+      CALL METHOD mo_grid->register_edit_event
+        EXPORTING
+          i_event_id = cl_gui_alv_grid=>mc_evt_enter.
+    ELSE.
+      refresh_table_display(
+        EXPORTING
+          iv_grid = mo_grid
+          is_layo = ms_layo
+          it_fcat = mt_fcat ).
+    ENDIF.
+  ENDMETHOD.
+  METHOD fieldcat.
+    DEFINE set_text.
+      <fs_fcat>-seltext   = &1.
+      <fs_fcat>-reptext   = &1.
+      <fs_fcat>-scrtext_l = &1.
+      <fs_fcat>-scrtext_m = &1.
+      <fs_fcat>-scrtext_s = &1.
+    END-OF-DEFINITION.
+    DATA: lt_fieldcat TYPE slis_t_fieldcat_alv.
+    IF mc_datastr EQ 'X'.
+      CALL FUNCTION 'LVC_FIELDCATALOG_MERGE'
+        EXPORTING
+          i_structure_name   = iv_strucname
+          i_bypassing_buffer = 'X'
+          i_internal_tabname = iv_itabname
+        CHANGING
+          ct_fieldcat        = ct_fcat.
+    ELSE.
+      CALL FUNCTION 'REUSE_ALV_FIELDCATALOG_MERGE'
+        EXPORTING
+          i_program_name     = sy-repid
+          i_internal_tabname = 'GT_A'
+          i_inclname         = sy-repid
+        CHANGING
+          ct_fieldcat        = lt_fieldcat.
+
+      CALL FUNCTION 'LVC_TRANSFER_FROM_SLIS'
+        EXPORTING
+          it_fieldcat_alv = lt_fieldcat
+        IMPORTING
+          et_fieldcat_lvc = ct_fcat
+        TABLES
+          it_data         = mt_alv.
+    ENDIF.
+    LOOP AT ct_fcat ASSIGNING FIELD-SYMBOL(<fs_fcat>).
+
+      CASE <fs_fcat>-fieldname.
+        WHEN 'WRBTR'.
+          <fs_fcat>-do_sum = 'X'.
+      ENDCASE.
+    ENDLOOP.
+  ENDMETHOD.
+  METHOD layout.
+    cs_layo-zebra      = 'X'.
+    cs_layo-cwidth_opt = 'X'.
+    cs_layo-sel_mode   = 'A'.
+*    cs_layo-edit_mode  = 'A'.
+*    cs_layo-edit  = 'X'.
+*    cs_layo-ctab_fname = 'CELLCOLOR'.
+*    cs_layo-stylefname = 'CELLTAB'.
+*    cs_layo-box_fname  = 'SELECTED'.
+*    cs_layo-excp_fname = 'STATUS'.
+  ENDMETHOD.
+  METHOD variant.
+    cs_variant-report   = sy-repid.
+    cs_variant-handle   = 1.
+    cs_variant-username = sy-uname.
+  ENDMETHOD.
+  METHOD refresh_table_display.
+*->layotaki değişiklik için
+    CALL METHOD iv_grid->set_frontend_layout
+      EXPORTING
+        is_layout = is_layo.
+
+*->fieldcatalogdaki değişiklik için
+    CALL METHOD iv_grid->set_frontend_fieldcatalog
+      EXPORTING
+        it_fieldcatalog = it_fcat.
+
+*->tablodaki değişiklik için
+    iv_grid->refresh_table_display(
+      EXPORTING
+        is_stable = ms_stbl
+      EXCEPTIONS
+        finished  = 1
+        OTHERS    = 2 ).
+  ENDMETHOD.
+  METHOD exclude_buttons.
+    rv_buttons = VALUE #(
+                         ( cl_gui_alv_grid=>mc_fc_loc_copy_row )
+                         ( cl_gui_alv_grid=>mc_fc_loc_delete_row )
+                         ( cl_gui_alv_grid=>mc_fc_loc_append_row )
+                         ( cl_gui_alv_grid=>mc_fc_loc_insert_row )
+                         ( cl_gui_alv_grid=>mc_fc_loc_move_row )
+                         ( cl_gui_alv_grid=>mc_fc_loc_cut )
+                         ( cl_gui_alv_grid=>mc_fc_loc_copy )
+                         ( cl_gui_alv_grid=>mc_fc_loc_paste )
+                         ( cl_gui_alv_grid=>mc_fc_refresh )
+                         ( cl_gui_alv_grid=>mc_fc_loc_undo )
+                         ( cl_gui_alv_grid=>mc_fc_loc_paste_new_row ) ).
+  ENDMETHOD.
+  METHOD status_0100.
+    DATA: lv_linne1 TYPE i.
+    DESCRIBE TABLE mt_alv LINES lv_linne1.
+    SET PF-STATUS 'GUI'.
+    SET TITLEBAR  'GUI_TITLE' WITH lv_linne1.
+    IF mo_dock IS INITIAL.
+      display( ).
+    ENDIF.
+  ENDMETHOD.
+  METHOD user_command_0100.
+    CASE gv_code_100.
+      WHEN '&F03' OR '&F15' OR '&F12'.
+        LEAVE TO SCREEN 0.
+
+      WHEN 'KAYIT'.
+        DATA(lt_selected_rows) = get_selected_rows( iv_grid = mo_grid ).
+
+        IF lines( lt_selected_rows ) = 0.
+          MESSAGE |Lütfen kayıt atmak istediğiniz satırları seçiniz!| TYPE 'S' DISPLAY LIKE 'W'.
+          RETURN.
+        ENDIF.
+
+        CLEAR : gt_mess_all, gt_mess_all[], gt_komisyon, gt_komisyon[].
+
+        LOOP AT lt_selected_rows INTO DATA(ls_selected_row).
+          READ TABLE mt_alv INTO DATA(ls_alv_line) INDEX ls_selected_row-index.
+          IF sy-subrc = 0.
+            SELECT SINGLE *
+              FROM zfi_t_komisyon
+              INTO @DATA(ls_komisyon_check)
+              WHERE sira_no = @ls_alv_line-sira_no AND
+                    belnr   = @ls_alv_line-belnr   AND
+                    docno   = @ls_alv_line-docno   AND
+                   ( belnr2 = ' ' OR belnr2 IS NULL ).
+
+            IF sy-subrc = 0.
+              APPEND ls_komisyon_check TO gt_komisyon.
+            ENDIF.
+          ENDIF.
+        ENDLOOP.
+
+        IF lines( gt_komisyon ) = 0.
+          MESSAGE |İşlenecek kayıt bulunamadı veya kayıtlar zaten işlenmiş!| TYPE 'S' DISPLAY LIKE 'W'.
+          RETURN.
+        ENDIF.
+
+        IF gv_error IS INITIAL.
+          LOOP AT gt_komisyon INTO gs_komisyon.
+
+            CLEAR : header, obj_type, obj_key, obj_sys, itemno_acc.
+            REFRESH : gt_accountgl, gt_currencyamount, gt_accountpayable,
+                      gt_return.
+
+            header-obj_type   = 'BKPFF'.
+            header-bus_act    = 'RFBU'.
+            header-doc_date   = gs_komisyon-tarih.
+            header-pstng_date = gs_komisyon-tarih.
+            header-ref_doc_no = gs_komisyon-krrfn.
+            header-username   = sy-uname.
+            header-comp_code  = gs_komisyon-bukrs.
+            header-doc_type   = 'SA'.
+
+            """ Kalem 1
+            SELECT SINGLE *
+              FROM zfi_t_anahesap
+              INTO @DATA(ls_anahesap)
+              WHERE anahesap = @gs_komisyon-anahesap AND
+                    bukrs    = @gs_komisyon-bukrs    AND
+                    bschl    = '50'.
+
+            ADD 1 TO itemno_acc.
+
+            CLEAR gs_accountgl.
+            gs_accountgl-itemno_acc = itemno_acc.
+            gs_accountgl-gl_account = ls_anahesap-anahesap.
+            gs_accountgl-item_text  = gs_komisyon-krrfn.
+            APPEND gs_accountgl TO gt_accountgl.
+
+            CLEAR gs_currencyamount.
+            gs_currencyamount-itemno_acc = itemno_acc.
+            gs_currencyamount-currency_iso = gs_komisyon-waers.
+            gs_currencyamount-amt_doccur  = gs_komisyon-kmsytutari * -1.
+            APPEND gs_currencyamount TO gt_currencyamount.
+
+            """ Kalem 2
+            gs_komisyon-hkont2 = '7800000002'.
+            gs_komisyon-bschl  = '40'.
+
+            ADD 1 TO itemno_acc.
+
+            CLEAR gs_accountgl.
+            gs_accountgl-itemno_acc = itemno_acc.
+            gs_accountgl-gl_account = gs_komisyon-hkont2.
+            gs_accountgl-item_text  = gs_komisyon-krrfn.
+            APPEND gs_accountgl TO gt_accountgl.
+
+            CLEAR gs_currencyamount.
+            gs_currencyamount-itemno_acc = itemno_acc.
+            gs_currencyamount-currency_iso = gs_komisyon-waers.
+            gs_currencyamount-amt_doccur  = gs_komisyon-kmsytutari.
+            APPEND gs_currencyamount TO gt_currencyamount.
+
+            CALL FUNCTION 'BAPI_ACC_DOCUMENT_POST'
+              EXPORTING
+                documentheader = header
+              IMPORTING
+                obj_type       = obj_type
+                obj_key        = obj_key
+                obj_sys        = obj_sys
+              TABLES
+                accountgl      = gt_accountgl
+                accountpayable = gt_accountpayable
+                currencyamount = gt_currencyamount
+                return         = gt_return.
+
+            APPEND LINES OF gt_return TO gt_mess_all.
+
+            IF obj_key IS NOT INITIAL AND obj_key NE '$'.
+              CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+                EXPORTING
+                  wait = 'X'.
+
+              UPDATE zfi_t_komisyon
+                 SET belnr2  = obj_key(10)
+                     hkont2  = gs_komisyon-hkont2
+                     stblg   = gs_komisyon-stblg
+               WHERE sira_no = gs_komisyon-sira_no AND
+                     belnr   = gs_komisyon-belnr   AND
+                     docno   = gs_komisyon-docno   AND
+                     belnr2  = ' '.
+
+              IF sy-subrc = 0.
+                COMMIT WORK AND WAIT.
+                MESSAGE |Kayıt başarıyla atılmıştır. Belge No: { obj_key(10) }| TYPE 'S'.
+                CLEAR gv_error.
+              ENDIF.
+            ELSE.
+              CALL FUNCTION 'BAPI_TRANSACTION_ROLLBACK'.
+              gv_error = 'X'.
+            ENDIF.
+          ENDLOOP.
+
+          get_data( ).
+
+          refresh_table_display(
+            EXPORTING
+              iv_grid = mo_grid
+              is_layo = ms_layo
+              it_fcat = mt_fcat ).
+
+          REFRESH gt_mess.
+
+          IF gv_error = 'X'.
+            LOOP AT gt_mess_all INTO gs_mess_all.
+              CLEAR wa_mess.
+              wa_mess-msgid = gs_mess_all-id.
+              wa_mess-msgty = gs_mess_all-type.
+              wa_mess-msgno = gs_mess_all-number.
+              wa_mess-msgv1 = gs_mess_all-message_v1.
+              wa_mess-msgv2 = gs_mess_all-message_v2.
+              wa_mess-msgv3 = gs_mess_all-message_v3.
+              wa_mess-msgv4 = gs_mess_all-message_v4.
+              APPEND wa_mess TO gt_mess.
+            ENDLOOP.
+
+            CALL FUNCTION 'C14Z_MESSAGES_SHOW_AS_POPUP'
+              TABLES
+                i_message_tab = gt_mess.
+          ENDIF.
+        ENDIF.
+
+    ENDCASE.
+  ENDMETHOD.
+
+ENDCLASS. 

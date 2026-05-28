@@ -1,0 +1,74 @@
+TABLES : zfi_teminat, bkpf, zfi_s_teminat_rapor, kna1, lfa1, bsid, bsik.
+
+*->Seçim Ekranı
+SELECTION-SCREEN BEGIN OF BLOCK b1 WITH FRAME TITLE TEXT-001.
+SELECT-OPTIONS : s_bukrs FOR zfi_teminat-bukrs OBLIGATORY DEFAULT '1170'
+                NO-EXTENSION NO INTERVALS.
+
+PARAMETERS : p_blart TYPE blart.
+
+SELECT-OPTIONS : s_umskz FOR zfi_teminat-umskz_odk.
+SELECTION-SCREEN SKIP 1.
+
+SELECT-OPTIONS : s_akatr FOR zfi_teminat-akatr.
+SELECT-OPTIONS : s_akotr FOR zfi_teminat-akotr.
+
+PARAMETERS : p_bldat2 TYPE bldat.
+SELECTION-SCREEN SKIP 1.
+
+PARAMETERS : p_krrfn TYPE zfi_teminat-krrfn,
+             p_urun  TYPE zfi_teminat-teurun.
+SELECTION-SCREEN SKIP 1.
+
+SELECTION-SCREEN BEGIN OF LINE.
+PARAMETERS : p_rdk RADIOBUTTON GROUP g1 DEFAULT 'X' USER-COMMAND rd.
+
+SELECTION-SCREEN COMMENT 4(17) TEXT-010 FOR FIELD p_rdk.
+SELECTION-SCREEN POSITION POS_LOW.
+
+SELECT-OPTIONS : s_kunnr FOR zfi_teminat-kunnr MODIF ID s1.
+SELECTION-SCREEN END OF LINE.
+
+SELECTION-SCREEN BEGIN OF LINE.
+PARAMETERS : p_rdl RADIOBUTTON GROUP g1.
+
+SELECTION-SCREEN COMMENT 4(17) TEXT-011 FOR FIELD p_rdl.
+SELECTION-SCREEN POSITION POS_LOW.
+
+SELECT-OPTIONS : s_lifnr FOR zfi_teminat-lifnr MODIF ID s2.
+SELECTION-SCREEN END OF LINE.
+
+SELECTION-SCREEN END OF BLOCK b1.
+
+SELECTION-SCREEN BEGIN OF BLOCK b2 WITH FRAME TITLE TEXT-003.
+PARAMETERS : p_tem  RADIOBUTTON GROUP rbg USER-COMMAND ucom DEFAULT 'X',
+             p_iade RADIOBUTTON GROUP rbg.
+SELECTION-SCREEN END OF BLOCK b2.
+
+*->DATA
+DATA : vcomm TYPE sscrfields-ucomm.
+
+DATA : BEGIN OF gt_bseg OCCURS 0,
+         belnr   LIKE bseg-belnr,
+         gjahr   LIKE bseg-gjahr,
+         bukrs   LIKE bseg-bukrs,
+         umskz   LIKE bseg-umskz,
+         dmbtr   LIKE bseg-dmbtr,
+         wrbtr   LIKE bseg-dmbtr,
+         h_blart LIKE bseg-h_blart,
+         shkzg   LIKE bseg-shkzg,
+       END OF gt_bseg.
+
+DATA : gc_0100         TYPE REF TO cl_gui_custom_container,
+       gg_0100         TYPE REF TO cl_gui_alv_grid,
+       gt_fldct        TYPE lvc_t_fcat,
+       gt_exclude      TYPE ui_functions,
+       gs_layout_0100  TYPE lvc_s_layo,
+       gs_variant_0100 TYPE disvariant,
+       gv_ok_0100      TYPE sy-ucomm.
+
+DATA : gs_bseg    LIKE LINE OF gt_bseg,
+       gs_bseg2   TYPE bseg,
+       gt_form    TYPE TABLE OF zfi_s_teminat_rapor,
+       gt_teminat TYPE TABLE OF zfi_s_teminat_rapor,
+       gs_teminat TYPE zfi_s_teminat_rapor.

@@ -1,0 +1,19 @@
+REPORT zfi_r_teminat.
+
+INCLUDE : zfi_r_i_teminat_top,
+          zfi_r_i_teminat_class,
+          zfi_r_i_teminat_pbo,
+          zfi_r_i_teminat_pai,
+          zfi_r_i_teminat_form.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_blart.
+  PERFORM f4_search_help.
+
+AT SELECTION-SCREEN OUTPUT.
+  PERFORM selection_screen_output.
+
+START-OF-SELECTION.
+  PERFORM f_get_data.
+
+END-OF-SELECTION.
+  CALL SCREEN 0100. 

@@ -1,0 +1,40 @@
+*&---------------------------------------------------------------------*
+*& Include          ZFI_P_I_TEMINAT_CLS
+*&---------------------------------------------------------------------*
+
+CLASS lcl_event_handler IMPLEMENTATION.
+  METHOD handle_on_data_changed.
+    FIELD-SYMBOLS : <fs_row>   LIKE LINE OF gt_data,
+                    <fs_field> TYPE any.
+
+    LOOP AT er_data_changed->mt_good_cells
+     REFERENCE INTO DATA(lo_cell) WHERE fieldname = 'TARIH'.
+
+      READ TABLE gt_data ASSIGNING <fs_row> INDEX lo_cell->row_id.
+      IF sy-subrc <> 0.
+        CONTINUE.
+      ENDIF.
+
+      ASSIGN COMPONENT lo_cell->fieldname OF STRUCTURE <fs_row> TO <fs_field>.
+      IF sy-subrc <> 0.
+        CONTINUE.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.                 " HANDLE_ON_DATA_CHANGED
+
+  METHOD handle_double_click.
+    FIELD-SYMBOLS : <fs_row> LIKE LINE OF gt_data.
+
+    READ TABLE gt_data ASSIGNING <fs_row> INDEX e_row.
+    IF sy-subrc <> 0.
+      RETURN.
+    ENDIF.
+
+    CASE e_column-fieldname.
+      WHEN 'BELNR2'.
+        PERFORM f_show_doc USING <fs_row>-bukrs
+                                 <fs_row>-belnr2
+                                 <fs_row>-tarih+0(4).
+    ENDCASE.
+  ENDMETHOD.                 " HANDLE_DOUBLE_CLICK
+ENDCLASS.

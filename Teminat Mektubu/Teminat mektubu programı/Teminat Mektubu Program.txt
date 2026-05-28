@@ -1,0 +1,21 @@
+
+REPORT zfi_p_teminat.
+
+INCLUDE zfi_p_i_teminat_top.
+
+AT SELECTION-SCREEN OUTPUT.
+  PERFORM selection_screen_output.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_docno.
+  PERFORM f_docno_popup.
+
+START-OF-SELECTION.
+  IF r_vade = 'X'.
+    PERFORM f_vade_degisikligi.
+  ELSE.
+    PERFORM f_init.
+    PERFORM f_main_screen.
+  ENDIF.
+
+  INCLUDE : zfi_p_i_teminat_form,
+            zfi_p_i_teminat_cls. 

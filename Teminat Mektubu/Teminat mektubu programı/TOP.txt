@@ -1,0 +1,128 @@
+
+*->Variable Definations
+TABLES : zfi_teminat.
+
+SELECTION-SCREEN BEGIN OF SCREEN 201.
+
+PARAMETER : p_gjahr LIKE bkpf-gjahr OBLIGATORY DEFAULT sy-datum(4).
+SELECT-OPTIONS : s_bukrs FOR zfi_teminat-bukrs,
+                 s_isltr FOR zfi_teminat-isltr.
+
+SELECTION-SCREEN END OF SCREEN 201.
+
+SELECTION-SCREEN BEGIN OF BLOCK b1 WITH FRAME TITLE TEXT-001.
+
+PARAMETERS : r_at   RADIOBUTTON GROUP r1 DEFAULT 'X'  USER-COMMAND rd  MODIF ID gr2,
+             r_vt   RADIOBUTTON GROUP r1                               MODIF ID gr2,
+             r_vade RADIOBUTTON GROUP r1.
+
+"r_ak RADIOBUTTON GROUP r1.
+SELECTION-SCREEN END OF BLOCK b1.
+
+SELECTION-SCREEN BEGIN OF BLOCK b3 WITH FRAME TITLE TEXT-002 .
+
+PARAMETER : p_gjahr1 TYPE bkpf-gjahr         DEFAULT sy-datum(4) MODIF ID gr1,
+            p_bukrs  TYPE zfi_teminat-bukrs  DEFAULT  ''         MODIF ID gr1,
+            p_belnr  TYPE zfi_teminat-belnr                      MODIF ID gr1,
+            p_docno  TYPE zfi_teminat-docno                      MODIF ID gr1.
+
+SELECTION-SCREEN END OF BLOCK b3.
+
+*->DATA
+CLASS lcl_event_handler DEFINITION DEFERRED.
+CLASS lcl_event_handler DEFINITION.
+  PUBLIC SECTION.
+    DATA : wa_toolbar TYPE stb_button,
+           utilities  TYPE REF TO cl_gui_frontend_services.
+    METHODS:
+      handle_on_data_changed FOR EVENT data_changed OF cl_gui_alv_grid
+        IMPORTING er_data_changed
+                    e_onf4
+                    e_onf4_before
+                    e_onf4_after
+                    e_ucomm
+                    sender,
+
+      handle_double_click FOR EVENT double_click OF cl_gui_alv_grid
+        IMPORTING e_row
+                    e_column
+                    es_row_no
+                    sender.
+ENDCLASS.
+
+DATA : name   TYPE vrm_id,
+       gt_tab TYPE vrm_values,
+       wa     LIKE LINE OF gt_tab.
+
+DATA : gv_mode,
+       gv_docno          TYPE zfi_de_docno,
+       gv_no             TYPE zfi_de_no,
+       gv_error,
+       gv_title(30),
+       gv_date_text1(30),
+       gv_date_text2(30),
+       gv_iade_tarihi    TYPE datum,
+       gv_ekbelge        TYPE flag,
+       gv_kcikis_tutar   LIKE vbrk-mwsbk.
+
+DATA : header            LIKE bapiache09,
+       obj_type          LIKE bapiache09-obj_type,
+       obj_key           LIKE bapiache09-obj_key,
+       obj_sys           LIKE bapiache09-obj_sys,
+       accountgl         LIKE bapiacgl09 OCCURS 0 WITH HEADER LINE,
+       accountreceivable LIKE bapiacar09 OCCURS 0 WITH HEADER LINE,
+       accountpayable    LIKE bapiacap09 OCCURS 0 WITH HEADER LINE,
+       currencyamount    LIKE bapiaccr09 OCCURS 0 WITH HEADER LINE,
+       return            LIKE bapiret2   OCCURS 0 WITH HEADER LINE,
+       gt_mess_all       LIKE bapiret2   OCCURS 0 WITH HEADER LINE,
+       itemno_acc        LIKE bapiaccr09-itemno_acc.
+
+DATA : gt_mess TYPE esp1_message_tab_type,
+       wa_mess TYPE esp1_message_wa_type.
+
+DATA : itab               TYPE TABLE OF zfi_teminat_alv_st WITH HEADER LINE,
+       gt_months          TYPE TABLE OF t247 WITH HEADER LINE,
+       ok_code            LIKE sy-ucomm,
+       g_container        TYPE scrfname VALUE 'CON',
+       g_grid             TYPE REF TO cl_gui_alv_grid,
+       g_custom_container TYPE REF TO cl_gui_custom_container,
+       gt_fieldcat        TYPE lvc_t_fcat,
+       gs_layout          TYPE lvc_s_layo,
+       g_variant          TYPE disvariant.
+
+DATA : ls_layo TYPE lvc_s_layo,
+       lt_fcat TYPE lvc_t_fcat.
+
+DATA ls_vari TYPE disvariant.
+
+DATA : mo_grid TYPE REF TO cl_gui_alv_grid,
+       mo_dock TYPE REF TO cl_gui_docking_container,
+       mo_stbl TYPE lvc_s_stbl.
+
+DATA lo_handler TYPE REF TO lcl_event_handler.
+
+DATA : gv_lock_fields    TYPE abap_bool VALUE abap_false,
+       gv_control_active TYPE abap_bool VALUE abap_false.
+
+CONSTANTS gc_carpan TYPE p DECIMALS 2 VALUE '1.05'.
+
+FIELD-SYMBOLS: <fs_itab> TYPE zfi_teminat_alv_st,
+               <fs>      TYPE any,
+               <fs2>     TYPE any,
+               <fs_data> TYPE zfi_teminat.
+
+DATA : gt_goruntuler  TYPE filetable,
+       ls_file_path   TYPE file_table,
+       gv_file_name   TYPE string,
+       gv_flag        TYPE char1,
+       gv_goruntu_flg TYPE char1.
+
+DATA gv_readonly TYPE abap_bool VALUE abap_false.
+
+DATA : gt_log TYPE TABLE OF zfi_teminat.
+
+DATA : gt_data        TYPE TABLE OF zfi_s_komisyon2,
+       gs_komisyon    TYPE zfi_s_komisyon2,
+       gs_komisyon_db TYPE zfi_t_komisyon.
+
+DATA gv_max TYPE zfi_t_komisyon-sira_no.

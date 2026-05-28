@@ -1,0 +1,1455 @@
+*&---------------------------------------------------------------------*
+*& Include          ZFI_R_I_TEMINAT_FORM                               *
+*&---------------------------------------------------------------------*
+
+*&---------------------------------------------------------------------*
+*& Form F_GET_DATA
+*&---------------------------------------------------------------------*
+FORM f_get_data.
+  DATA : lv_s_tutar TYPE bsid-wrbtr,
+         lv_h_tutar TYPE bsid-wrbtr.
+
+  CLEAR : gt_teminat[], gt_bseg[], gs_teminat, gs_bseg.
+
+IF p_rdk = abap_true. "Müşteri (KUNNR)
+    IF p_tem = abap_true.
+
+      IF s_umskz IS NOT INITIAL.
+
+        IF ( s_akatr IS NOT INITIAL OR s_akotr IS NOT INITIAL )
+           OR s_kunnr IS NOT INITIAL.
+
+          IF s_kunnr IS NOT INITIAL.
+
+            IF s_akatr IS NOT INITIAL OR s_akotr IS NOT INITIAL.
+
+              IF p_urun IS NOT INITIAL AND p_krrfn IS NOT INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~kunnr     IN @s_kunnr
+                    AND a~koart     EQ 'D'
+                    AND a~umskz_odk IN @s_umskz
+                    AND a~akatr     IN @s_akatr
+                    AND a~akotr     IN @s_akotr
+                    AND a~teurun    EQ @p_urun
+                    AND a~krrfn     EQ @p_krrfn.
+
+              ELSEIF p_urun IS NOT INITIAL AND p_krrfn IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~kunnr     IN @s_kunnr
+                    AND a~koart     EQ 'D'
+                    AND a~umskz_odk IN @s_umskz
+                    AND a~akatr     IN @s_akatr
+                    AND a~akotr     IN @s_akotr
+                    AND a~teurun    EQ @p_urun.
+
+              ELSEIF p_krrfn IS NOT INITIAL AND p_urun IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~kunnr     IN @s_kunnr
+                    AND a~koart     EQ 'D'
+                    AND a~umskz_odk IN @s_umskz
+                    AND a~akatr     IN @s_akatr
+                    AND a~akotr     IN @s_akotr
+                    AND a~krrfn     EQ @p_krrfn.
+
+              ELSE.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~kunnr     IN @s_kunnr
+                    AND a~koart     EQ 'D'
+                    AND a~umskz_odk IN @s_umskz
+                    AND a~akatr     IN @s_akatr
+                    AND a~akotr     IN @s_akotr.
+
+              ENDIF.
+
+            ELSE.
+
+              IF p_urun IS NOT INITIAL AND p_krrfn IS NOT INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~kunnr     IN @s_kunnr
+                    AND a~koart     EQ 'D'
+                    AND a~umskz_odk IN @s_umskz
+                    AND a~teurun    EQ @p_urun
+                    AND a~krrfn     EQ @p_krrfn.
+
+              ELSEIF p_urun IS NOT INITIAL AND p_krrfn IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~kunnr     IN @s_kunnr
+                    AND a~koart     EQ 'D'
+                    AND a~umskz_odk IN @s_umskz
+                    AND a~teurun    EQ @p_urun.
+
+              ELSEIF p_krrfn IS NOT INITIAL AND p_urun IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~kunnr     IN @s_kunnr
+                    AND a~koart     EQ 'D'
+                    AND a~umskz_odk IN @s_umskz
+                    AND a~krrfn     EQ @p_krrfn.
+
+              ELSE.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~kunnr     IN @s_kunnr
+                    AND a~koart     EQ 'D'
+                    AND a~umskz_odk IN @s_umskz.
+
+              ENDIF.
+
+            ENDIF.
+
+          ELSEIF s_akatr IS NOT INITIAL OR s_akotr IS NOT INITIAL.
+
+            IF p_urun IS NOT INITIAL AND p_krrfn IS NOT INITIAL.
+
+              SELECT a~*
+                FROM zfi_teminat AS a
+                INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                WHERE a~bukrs     IN @s_bukrs
+                  AND a~blart     EQ @p_blart
+                  AND a~kunnr     NE @space
+                  AND a~koart     EQ 'D'
+                  AND a~umskz_odk IN @s_umskz
+                  AND a~akatr     IN @s_akatr
+                  AND a~akotr     IN @s_akotr
+                  AND a~teurun    EQ @p_urun
+                  AND a~krrfn     EQ @p_krrfn.
+
+            ELSEIF p_urun IS NOT INITIAL AND p_krrfn IS INITIAL.
+
+              SELECT a~*
+                FROM zfi_teminat AS a
+                INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                WHERE a~bukrs     IN @s_bukrs
+                  AND a~blart     EQ @p_blart
+                  AND a~kunnr     NE @space
+                  AND a~koart     EQ 'D'
+                  AND a~umskz_odk IN @s_umskz
+                  AND a~akatr     IN @s_akatr
+                  AND a~akotr     IN @s_akotr
+                  AND a~teurun    EQ @p_urun.
+
+            ELSEIF p_krrfn IS NOT INITIAL AND p_urun IS INITIAL.
+
+              SELECT a~*
+                FROM zfi_teminat AS a
+                INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                WHERE a~bukrs     IN @s_bukrs
+                  AND a~blart     EQ @p_blart
+                  AND a~kunnr     NE @space
+                  AND a~koart     EQ 'D'
+                  AND a~umskz_odk IN @s_umskz
+                  AND a~akatr     IN @s_akatr
+                  AND a~akotr     IN @s_akotr
+                  AND a~krrfn     EQ @p_krrfn.
+
+            ELSE.
+
+              SELECT a~*
+                FROM zfi_teminat AS a
+                INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                WHERE a~bukrs     IN @s_bukrs
+                  AND a~blart     EQ @p_blart
+                  AND a~kunnr     NE @space
+                  AND a~koart     EQ 'D'
+                  AND a~umskz_odk IN @s_umskz
+                  AND a~akatr     IN @s_akatr
+                  AND a~akotr     IN @s_akotr.
+
+            ENDIF.
+
+          ENDIF.
+
+        ELSE.
+
+          IF p_urun IS NOT INITIAL AND p_krrfn IS NOT INITIAL.
+
+            SELECT a~*
+              FROM zfi_teminat AS a
+              INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+              WHERE a~bukrs     IN @s_bukrs
+                AND a~blart     EQ @p_blart
+                AND a~kunnr     NE @space
+                AND a~koart     EQ 'D'
+                AND a~umskz_odk IN @s_umskz
+                AND a~teurun    EQ @p_urun
+                AND a~krrfn     EQ @p_krrfn.
+
+          ELSEIF p_urun IS NOT INITIAL AND p_krrfn IS INITIAL.
+
+            SELECT a~*
+              FROM zfi_teminat AS a
+              INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+              WHERE a~bukrs     IN @s_bukrs
+                AND a~blart     EQ @p_blart
+                AND a~kunnr     NE @space
+                AND a~koart     EQ 'D'
+                AND a~umskz_odk IN @s_umskz
+                AND a~teurun    EQ @p_urun.
+
+          ELSEIF p_krrfn IS NOT INITIAL AND p_urun IS INITIAL.
+
+            SELECT a~*
+              FROM zfi_teminat AS a
+              INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+              WHERE a~bukrs     IN @s_bukrs
+                AND a~blart     EQ @p_blart
+                AND a~kunnr     NE @space
+                AND a~koart     EQ 'D'
+                AND a~umskz_odk IN @s_umskz
+                AND a~krrfn     EQ @p_krrfn.
+
+          ELSE.
+
+            SELECT a~*
+              FROM zfi_teminat AS a
+              INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+              WHERE a~bukrs     IN @s_bukrs
+                AND a~blart     EQ @p_blart
+                AND a~kunnr     NE @space
+                AND a~koart     EQ 'D'
+                AND a~umskz_odk IN @s_umskz.
+
+          ENDIF.
+
+        ENDIF.
+
+      ELSE.
+
+        IF ( s_akatr IS NOT INITIAL OR s_akotr IS NOT INITIAL )
+           OR s_kunnr IS NOT INITIAL.
+
+          IF s_kunnr IS NOT INITIAL.
+
+            IF s_akatr IS NOT INITIAL OR s_akotr IS NOT INITIAL.
+
+              IF p_urun IS NOT INITIAL AND p_krrfn IS NOT INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~kunnr     IN @s_kunnr
+                    AND a~koart     EQ 'D'
+                    AND a~akatr     IN @s_akatr
+                    AND a~akotr     IN @s_akotr
+                    AND a~teurun    EQ @p_urun
+                    AND a~krrfn     EQ @p_krrfn.
+
+              ELSEIF p_urun IS NOT INITIAL AND p_krrfn IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~kunnr     IN @s_kunnr
+                    AND a~koart     EQ 'D'
+                    AND a~akatr     IN @s_akatr
+                    AND a~akotr     IN @s_akotr
+                    AND a~teurun    EQ @p_urun.
+
+              ELSEIF p_krrfn IS NOT INITIAL AND p_urun IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~kunnr     IN @s_kunnr
+                    AND a~koart     EQ 'D'
+                    AND a~akatr     IN @s_akatr
+                    AND a~akotr     IN @s_akotr
+                    AND a~krrfn     EQ @p_krrfn.
+
+              ELSE.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~kunnr     IN @s_kunnr
+                    AND a~koart     EQ 'D'
+                    AND a~akatr     IN @s_akatr
+                    AND a~akotr     IN @s_akotr.
+
+              ENDIF.
+
+            ELSE.
+
+              IF p_urun IS NOT INITIAL AND p_krrfn IS NOT INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~kunnr     IN @s_kunnr
+                    AND a~koart     EQ 'D'
+                    AND a~teurun    EQ @p_urun
+                    AND a~krrfn     EQ @p_krrfn.
+
+              ELSEIF p_urun IS NOT INITIAL AND p_krrfn IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~kunnr     IN @s_kunnr
+                    AND a~koart     EQ 'D'
+                    AND a~teurun    EQ @p_urun.
+
+              ELSEIF p_krrfn IS NOT INITIAL AND p_urun IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~kunnr     IN @s_kunnr
+                    AND a~koart     EQ 'D'
+                    AND a~krrfn     EQ @p_krrfn.
+
+              ELSE.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~kunnr     IN @s_kunnr
+                    AND a~koart     EQ 'D'.
+
+              ENDIF.
+
+            ENDIF.
+
+          ELSEIF s_akatr IS NOT INITIAL OR s_akotr IS NOT INITIAL.
+
+            IF p_urun IS NOT INITIAL AND p_krrfn IS NOT INITIAL.
+
+              SELECT a~*
+                FROM zfi_teminat AS a
+                INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                WHERE a~bukrs     IN @s_bukrs
+                  AND a~blart     EQ @p_blart
+                  AND a~kunnr     NE @space
+                  AND a~koart     EQ 'D'
+                  AND a~akatr     IN @s_akatr
+                  AND a~akotr     IN @s_akotr
+                  AND a~teurun    EQ @p_urun
+                  AND a~krrfn     EQ @p_krrfn.
+
+            ELSEIF p_urun IS NOT INITIAL AND p_krrfn IS INITIAL.
+
+              SELECT a~*
+                FROM zfi_teminat AS a
+                INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                WHERE a~bukrs     IN @s_bukrs
+                  AND a~blart     EQ @p_blart
+                  AND a~kunnr     NE @space
+                  AND a~koart     EQ 'D'
+                  AND a~akatr     IN @s_akatr
+                  AND a~akotr     IN @s_akotr
+                  AND a~teurun    EQ @p_urun.
+
+            ELSEIF p_krrfn IS NOT INITIAL AND p_urun IS INITIAL.
+
+              SELECT a~*
+                FROM zfi_teminat AS a
+                INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                WHERE a~bukrs     IN @s_bukrs
+                  AND a~blart     EQ @p_blart
+                  AND a~kunnr     NE @space
+                  AND a~koart     EQ 'D'
+                  AND a~akatr     IN @s_akatr
+                  AND a~akotr     IN @s_akotr
+                  AND a~krrfn     EQ @p_krrfn.
+
+            ELSE.
+
+              SELECT a~*
+                FROM zfi_teminat AS a
+                INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                WHERE a~bukrs     IN @s_bukrs
+                  AND a~blart     EQ @p_blart
+                  AND a~kunnr     NE @space
+                  AND a~koart     EQ 'D'
+                  AND a~akatr     IN @s_akatr
+                  AND a~akotr     IN @s_akotr.
+
+            ENDIF.
+          ENDIF.
+
+        ELSE.
+
+          IF p_urun IS NOT INITIAL AND p_krrfn IS NOT INITIAL.
+
+            SELECT a~*
+              FROM zfi_teminat AS a
+              INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+              WHERE a~bukrs     IN @s_bukrs
+                AND a~blart     EQ @p_blart
+                AND a~kunnr     NE @space
+                AND a~koart     EQ 'D'
+                AND a~teurun    EQ @p_urun
+                AND a~krrfn     EQ @p_krrfn.
+
+          ELSEIF p_urun IS NOT INITIAL AND p_krrfn IS INITIAL.
+
+            SELECT a~*
+              FROM zfi_teminat AS a
+              INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+              WHERE a~bukrs     IN @s_bukrs
+                AND a~blart     EQ @p_blart
+                AND a~kunnr     NE @space
+                AND a~koart     EQ 'D'
+                AND a~teurun    EQ @p_urun.
+
+          ELSEIF p_krrfn IS NOT INITIAL AND p_urun IS INITIAL.
+
+            SELECT a~*
+              FROM zfi_teminat AS a
+              INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+              WHERE a~bukrs     IN @s_bukrs
+                AND a~blart     EQ @p_blart
+                AND a~kunnr     NE @space
+                AND a~koart     EQ 'D'
+                AND a~krrfn     EQ @p_krrfn.
+
+          ELSE.
+
+            SELECT a~*
+              FROM zfi_teminat AS a
+              INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+              WHERE a~bukrs     IN @s_bukrs
+                AND a~blart     EQ @p_blart
+                AND a~kunnr     NE @space
+                AND a~koart     EQ 'D'.
+
+          ENDIF.
+        ENDIF.
+      ENDIF.
+
+*-------------------- Açık Kalem Tutar (Müşteri) -------------------
+      LOOP AT gt_teminat ASSIGNING FIELD-SYMBOL(<fs_tem_kunnr>).
+        lv_s_tutar = 0.
+        lv_h_tutar = 0.
+
+        IF p_bldat2 IS INITIAL.
+
+          SELECT SUM( wrbtr )
+            INTO @lv_s_tutar
+            FROM bsid
+            WHERE bukrs = @<fs_tem_kunnr>-bukrs AND
+                  kunnr = @<fs_tem_kunnr>-kunnr AND
+                  shkzg = 'S'                   AND
+                  umskz = ''.
+
+          SELECT SUM( wrbtr )
+            INTO @lv_h_tutar
+            FROM bsid
+            WHERE bukrs = @<fs_tem_kunnr>-bukrs AND
+                  kunnr = @<fs_tem_kunnr>-kunnr AND
+                  shkzg = 'H'                   AND
+                  umskz = ''.
+        ELSE.
+
+          SELECT SUM( wrbtr )
+            INTO @lv_s_tutar
+            FROM bsid
+            WHERE bukrs = @<fs_tem_kunnr>-bukrs AND
+                  kunnr = @<fs_tem_kunnr>-kunnr AND
+                  shkzg = 'S'                   AND
+                  umskz = ''                    AND
+                  bldat <= @p_bldat2.
+
+          SELECT SUM( wrbtr )
+            INTO @lv_h_tutar
+            FROM bsid
+            WHERE bukrs = @<fs_tem_kunnr>-bukrs AND
+                  kunnr = @<fs_tem_kunnr>-kunnr AND
+                  shkzg = 'H'                   AND
+                  umskz = ''                    AND
+                  bldat <= @p_bldat2.
+        ENDIF.
+
+        <fs_tem_kunnr>-acik_kalem_tutar = lv_s_tutar - lv_h_tutar.
+      ENDLOOP.
+
+    ELSE.
+
+      SELECT a~*
+        FROM zfi_teminat AS a
+        APPENDING CORRESPONDING FIELDS OF TABLE @gt_teminat
+        WHERE a~bukrs     IN @s_bukrs AND
+              a~blart2    NE @space   AND
+              a~akatr     IN @s_akatr AND
+              a~umskz_odk NE @space   AND
+              a~kunnr     NE @space   AND
+              a~stblg     NE @space   AND
+              a~akotr     IN @s_akotr AND
+              a~teurun    EQ @p_urun  AND
+              a~krrfn     EQ @p_krrfn.
+    ENDIF.
+
+  ELSEIF p_rdl = abap_true. "Satıcı (LIFNR)
+
+    IF p_tem = abap_true.
+
+      IF s_umskz IS NOT INITIAL.
+
+        IF ( s_akatr IS NOT INITIAL OR s_akotr IS NOT INITIAL )
+           OR s_lifnr IS NOT INITIAL.
+
+          IF s_lifnr IS NOT INITIAL.
+
+            IF s_akatr IS NOT INITIAL OR s_akotr IS NOT INITIAL.
+
+              IF p_urun IS INITIAL AND p_krrfn IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~lifnr     IN @s_lifnr
+                    AND a~koart     EQ 'K'
+                    AND a~umskz_odk IN @s_umskz
+                    AND a~akatr     IN @s_akatr
+                    AND a~akotr     IN @s_akotr.
+
+              ELSEIF p_urun IS NOT INITIAL AND p_krrfn IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~lifnr     IN @s_lifnr
+                    AND a~koart     EQ 'K'
+                    AND a~umskz_odk IN @s_umskz
+                    AND a~akatr     IN @s_akatr
+                    AND a~akotr     IN @s_akotr
+                    AND a~teurun    EQ @p_urun.
+
+              ELSEIF p_krrfn IS NOT INITIAL AND p_urun IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~lifnr     IN @s_lifnr
+                    AND a~koart     EQ 'K'
+                    AND a~umskz_odk IN @s_umskz
+                    AND a~akatr     IN @s_akatr
+                    AND a~akotr     IN @s_akotr
+                    AND a~krrfn     EQ @p_krrfn.
+
+              ELSE.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~lifnr     IN @s_lifnr
+                    AND a~koart     EQ 'K'
+                    AND a~umskz_odk IN @s_umskz
+                    AND a~akatr     IN @s_akatr
+                    AND a~akotr     IN @s_akotr
+                    AND a~teurun    EQ @p_urun
+                    AND a~krrfn     EQ @p_krrfn.
+
+              ENDIF.
+
+            ELSE.
+
+              IF p_urun IS INITIAL AND p_krrfn IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~lifnr     IN @s_lifnr
+                    AND a~koart     EQ 'K'
+                    AND a~umskz_odk IN @s_umskz.
+
+              ELSEIF p_urun IS NOT INITIAL AND p_krrfn IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~lifnr     IN @s_lifnr
+                    AND a~koart     EQ 'K'
+                    AND a~umskz_odk IN @s_umskz
+                    AND a~teurun    EQ @p_urun.
+
+              ELSEIF p_krrfn IS NOT INITIAL AND p_urun IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~lifnr     IN @s_lifnr
+                    AND a~koart     EQ 'K'
+                    AND a~umskz_odk IN @s_umskz
+                    AND a~krrfn     EQ @p_krrfn.
+
+              ELSE.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~lifnr     IN @s_lifnr
+                    AND a~koart     EQ 'K'
+                    AND a~umskz_odk IN @s_umskz
+                    AND a~teurun    EQ @p_urun
+                    AND a~krrfn     EQ @p_krrfn.
+
+              ENDIF.
+            ENDIF.
+
+          ELSEIF s_akatr IS NOT INITIAL OR s_akotr IS NOT INITIAL.
+
+            IF p_urun IS INITIAL AND p_krrfn IS INITIAL.
+
+              SELECT a~*
+                FROM zfi_teminat AS a
+                INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                WHERE a~bukrs     IN @s_bukrs
+                  AND a~blart     EQ @p_blart
+                  AND a~lifnr     NE @space
+                  AND a~koart     EQ 'K'
+                  AND a~umskz_odk IN @s_umskz
+                  AND a~akatr     IN @s_akatr
+                  AND a~akotr     IN @s_akotr.
+
+            ELSEIF p_urun IS NOT INITIAL AND p_krrfn IS INITIAL.
+
+              SELECT a~*
+                FROM zfi_teminat AS a
+                INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                WHERE a~bukrs     IN @s_bukrs
+                  AND a~blart     EQ @p_blart
+                  AND a~lifnr     NE @space
+                  AND a~koart     EQ 'K'
+                  AND a~umskz_odk IN @s_umskz
+                  AND a~akatr     IN @s_akatr
+                  AND a~akotr     IN @s_akotr
+                  AND a~teurun    EQ @p_urun.
+
+            ELSEIF p_krrfn IS NOT INITIAL AND p_urun IS INITIAL.
+
+              SELECT a~*
+                FROM zfi_teminat AS a
+                INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                WHERE a~bukrs     IN @s_bukrs
+                  AND a~blart     EQ @p_blart
+                  AND a~lifnr     NE @space
+                  AND a~koart     EQ 'K'
+                  AND a~umskz_odk IN @s_umskz
+                  AND a~akatr     IN @s_akatr
+                  AND a~akotr     IN @s_akotr
+                  AND a~krrfn     EQ @p_krrfn.
+
+            ELSE.
+
+              SELECT a~*
+                FROM zfi_teminat AS a
+                INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                WHERE a~bukrs     IN @s_bukrs
+                  AND a~blart     EQ @p_blart
+                  AND a~lifnr     NE @space
+                  AND a~koart     EQ 'K'
+                  AND a~umskz_odk IN @s_umskz
+                  AND a~akatr     IN @s_akatr
+                  AND a~akotr     IN @s_akotr
+                  AND a~teurun    EQ @p_urun
+                  AND a~krrfn     EQ @p_krrfn.
+
+            ENDIF.
+          ENDIF.
+
+        ELSE.
+          IF p_urun IS INITIAL AND p_krrfn IS INITIAL.
+
+            SELECT a~*
+              FROM zfi_teminat AS a
+              INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+              WHERE a~bukrs     IN @s_bukrs
+                AND a~blart     EQ @p_blart
+                AND a~lifnr     NE @space
+                AND a~koart     EQ 'K'
+                AND a~umskz_odk IN @s_umskz.
+
+          ELSEIF p_urun IS NOT INITIAL AND p_krrfn IS INITIAL.
+
+            SELECT a~*
+              FROM zfi_teminat AS a
+              INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+              WHERE a~bukrs     IN @s_bukrs
+                AND a~blart     EQ @p_blart
+                AND a~lifnr     NE @space
+                AND a~koart     EQ 'K'
+                AND a~umskz_odk IN @s_umskz
+                AND a~teurun    EQ @p_urun.
+
+          ELSEIF p_krrfn IS NOT INITIAL AND p_urun IS INITIAL.
+
+            SELECT a~*
+              FROM zfi_teminat AS a
+              INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+              WHERE a~bukrs     IN @s_bukrs
+                AND a~blart     EQ @p_blart
+                AND a~lifnr     NE @space
+                AND a~koart     EQ 'K'
+                AND a~umskz_odk IN @s_umskz
+                AND a~krrfn     EQ @p_krrfn.
+
+          ELSE.
+
+            SELECT a~*
+              FROM zfi_teminat AS a
+              INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+              WHERE a~bukrs     IN @s_bukrs
+                AND a~blart     EQ @p_blart
+                AND a~lifnr     NE @space
+                AND a~koart     EQ 'K'
+                AND a~umskz_odk IN @s_umskz
+                AND a~teurun    EQ @p_urun
+                AND a~krrfn     EQ @p_krrfn.
+
+          ENDIF.
+        ENDIF.
+
+      ELSE.
+
+        IF ( s_akatr IS NOT INITIAL OR s_akotr IS NOT INITIAL )
+           OR s_lifnr IS NOT INITIAL.
+
+          IF s_lifnr IS NOT INITIAL.
+
+            IF s_akatr IS NOT INITIAL OR s_akotr IS NOT INITIAL.
+
+              IF p_urun IS INITIAL AND p_krrfn IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~lifnr     IN @s_lifnr
+                    AND a~koart     EQ 'K'
+                    AND a~akatr     IN @s_akatr
+                    AND a~akotr     IN @s_akotr.
+
+              ELSEIF p_urun IS NOT INITIAL AND p_krrfn IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~lifnr     IN @s_lifnr
+                    AND a~koart     EQ 'K'
+                    AND a~akatr     IN @s_akatr
+                    AND a~akotr     IN @s_akotr
+                    AND a~teurun    EQ @p_urun.
+
+              ELSEIF p_krrfn IS NOT INITIAL AND p_urun IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~lifnr     IN @s_lifnr
+                    AND a~koart     EQ 'K'
+                    AND a~akatr     IN @s_akatr
+                    AND a~akotr     IN @s_akotr
+                    AND a~krrfn     EQ @p_krrfn.
+
+              ELSE.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs     IN @s_bukrs
+                    AND a~blart     EQ @p_blart
+                    AND a~lifnr     IN @s_lifnr
+                    AND a~koart     EQ 'K'
+                    AND a~akatr     IN @s_akatr
+                    AND a~akotr     IN @s_akotr
+                    AND a~teurun    EQ @p_urun
+                    AND a~krrfn     EQ @p_krrfn.
+
+              ENDIF.
+
+            ELSE.
+
+              IF p_urun IS INITIAL AND p_krrfn IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs IN @s_bukrs
+                    AND a~blart EQ @p_blart
+                    AND a~lifnr IN @s_lifnr
+                    AND a~koart EQ 'K'.
+
+              ELSEIF p_urun IS NOT INITIAL AND p_krrfn IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs  IN @s_bukrs
+                    AND a~blart  EQ @p_blart
+                    AND a~lifnr  IN @s_lifnr
+                    AND a~koart  EQ 'K'
+                    AND a~teurun EQ @p_urun.
+
+              ELSEIF p_krrfn IS NOT INITIAL AND p_urun IS INITIAL.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs IN @s_bukrs
+                    AND a~blart EQ @p_blart
+                    AND a~lifnr IN @s_lifnr
+                    AND a~koart EQ 'K'
+                    AND a~krrfn EQ @p_krrfn.
+
+              ELSE.
+
+                SELECT a~*
+                  FROM zfi_teminat AS a
+                  INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                  WHERE a~bukrs  IN @s_bukrs
+                    AND a~blart  EQ @p_blart
+                    AND a~lifnr  IN @s_lifnr
+                    AND a~koart  EQ 'K'
+                    AND a~teurun EQ @p_urun
+                    AND a~krrfn  EQ @p_krrfn.
+
+              ENDIF.
+
+            ENDIF.
+
+          ELSEIF s_akatr IS NOT INITIAL OR s_akotr IS NOT INITIAL.
+
+            IF p_urun IS INITIAL AND p_krrfn IS INITIAL.
+
+              SELECT a~*
+                FROM zfi_teminat AS a
+                INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                WHERE a~bukrs     IN @s_bukrs
+                  AND a~blart     EQ @p_blart
+                  AND a~lifnr     NE @space
+                  AND a~koart     EQ 'K'
+                  AND a~akatr     IN @s_akatr
+                  AND a~akotr     IN @s_akotr.
+
+            ELSEIF p_urun IS NOT INITIAL AND p_krrfn IS INITIAL.
+
+              SELECT a~*
+                FROM zfi_teminat AS a
+                INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                WHERE a~bukrs     IN @s_bukrs
+                  AND a~blart     EQ @p_blart
+                  AND a~lifnr     NE @space
+                  AND a~koart     EQ 'K'
+                  AND a~akatr     IN @s_akatr
+                  AND a~akotr     IN @s_akotr
+                  AND a~teurun    EQ @p_urun.
+
+            ELSEIF p_krrfn IS NOT INITIAL AND p_urun IS INITIAL.
+
+              SELECT a~*
+                FROM zfi_teminat AS a
+                INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                WHERE a~bukrs     IN @s_bukrs
+                  AND a~blart     EQ @p_blart
+                  AND a~lifnr     NE @space
+                  AND a~koart     EQ 'K'
+                  AND a~akatr     IN @s_akatr
+                  AND a~akotr     IN @s_akotr
+                  AND a~krrfn     EQ @p_krrfn.
+
+            ELSE.
+
+              SELECT a~*
+                FROM zfi_teminat AS a
+                INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+                WHERE a~bukrs     IN @s_bukrs
+                  AND a~blart     EQ @p_blart
+                  AND a~lifnr     NE @space
+                  AND a~koart     EQ 'K'
+                  AND a~akatr     IN @s_akatr
+                  AND a~akotr     IN @s_akotr
+                  AND a~teurun    EQ @p_urun
+                  AND a~krrfn     EQ @p_krrfn.
+
+            ENDIF.
+          ENDIF.
+
+        ELSE.
+
+          IF p_urun IS INITIAL AND p_krrfn IS INITIAL.
+
+            SELECT a~*
+              FROM zfi_teminat AS a
+              INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+              WHERE a~bukrs     IN @s_bukrs
+                AND a~blart     EQ @p_blart
+                AND a~lifnr     NE @space
+                AND a~koart     EQ 'K'.
+
+          ELSEIF p_urun IS NOT INITIAL AND p_krrfn IS INITIAL.
+
+            SELECT a~*
+              FROM zfi_teminat AS a
+              INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+              WHERE a~bukrs     IN @s_bukrs
+                AND a~blart     EQ @p_blart
+                AND a~lifnr     NE @space
+                AND a~koart     EQ 'K'
+                AND a~teurun    EQ @p_urun.
+
+          ELSEIF p_krrfn IS NOT INITIAL AND p_urun IS INITIAL.
+
+            SELECT a~*
+              FROM zfi_teminat AS a
+              INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+              WHERE a~bukrs     IN @s_bukrs
+                AND a~blart     EQ @p_blart
+                AND a~lifnr     NE @space
+                AND a~koart     EQ 'K'
+                AND a~krrfn     EQ @p_krrfn.
+
+          ELSE.
+
+            SELECT a~*
+              FROM zfi_teminat AS a
+              INTO CORRESPONDING FIELDS OF TABLE @gt_teminat
+              WHERE a~bukrs     IN @s_bukrs
+                AND a~blart     EQ @p_blart
+                AND a~lifnr     NE @space
+                AND a~koart     EQ 'K'
+                AND a~teurun    EQ @p_urun
+                AND a~krrfn     EQ @p_krrfn.
+
+          ENDIF.
+        ENDIF.
+      ENDIF.
+
+      "*-------------------- Açık Kalem Tutar (Satıcı) -------------------
+      LOOP AT gt_teminat ASSIGNING FIELD-SYMBOL(<fs_tem_lifnr>).
+        lv_s_tutar = 0.
+        lv_h_tutar = 0.
+
+        IF p_bldat2 IS INITIAL.
+
+          SELECT SUM( wrbtr )
+            INTO @lv_h_tutar
+            FROM bsik
+            WHERE bukrs = @<fs_tem_lifnr>-bukrs
+              AND lifnr = @<fs_tem_lifnr>-lifnr
+              AND shkzg = 'H'
+              AND umskz = ''.
+
+          SELECT SUM( wrbtr )
+            INTO @lv_s_tutar
+            FROM bsik
+            WHERE bukrs = @<fs_tem_lifnr>-bukrs
+              AND lifnr = @<fs_tem_lifnr>-lifnr
+              AND shkzg = 'S'
+              AND umskz = ''.
+
+        ELSE.
+
+          SELECT SUM( wrbtr )
+            INTO @lv_h_tutar
+            FROM bsik
+            WHERE bukrs = @<fs_tem_lifnr>-bukrs
+              AND lifnr = @<fs_tem_lifnr>-lifnr
+              AND shkzg = 'H'
+              AND umskz = ''
+              AND bldat <= @p_bldat2.
+
+          SELECT SUM( wrbtr )
+            INTO @lv_s_tutar
+            FROM bsik
+            WHERE bukrs = @<fs_tem_lifnr>-bukrs
+              AND lifnr = @<fs_tem_lifnr>-lifnr
+              AND shkzg = 'S'
+              AND umskz = ''
+              AND bldat <= @p_bldat2.
+
+        ENDIF.
+
+        <fs_tem_lifnr>-acik_kalem_tutar = lv_h_tutar - lv_s_tutar.
+      ENDLOOP.
+
+    ELSE.
+
+      SELECT a~*
+        FROM zfi_teminat AS a
+        APPENDING CORRESPONDING FIELDS OF TABLE @gt_teminat
+        WHERE a~bukrs     IN @s_bukrs
+          AND a~blart2    NE @space
+          AND a~akatr     IN @s_akatr
+          AND a~umskz_odk NE @space
+          AND a~lifnr     NE @space
+          AND a~stblg     NE @space
+          AND a~teurun    EQ @p_urun
+          AND a~krrfn     EQ @p_krrfn
+          AND a~akotr     IN @s_akotr.
+
+    ENDIF.
+  ENDIF.
+
+  IF gt_teminat[] IS NOT INITIAL.
+    SELECT belnr gjahr bukrs umskz dmbtr wrbtr shkzg
+      FROM bseg
+      INTO CORRESPONDING FIELDS OF TABLE gt_bseg
+      FOR ALL ENTRIES IN gt_teminat
+      WHERE belnr = gt_teminat-belnr AND
+            gjahr = gt_teminat-gjahr AND
+            bukrs = gt_teminat-bukrs.
+
+* Satıcı isimleri...
+    SELECT lifnr,name1
+      FROM lfa1
+      INTO TABLE @DATA(lt_lfa1)
+      FOR ALL ENTRIES IN @gt_teminat
+      WHERE lifnr = @gt_teminat-lifnr.
+
+* Müşteri isimleri...
+    SELECT kunnr,name1
+      FROM kna1
+      INTO TABLE @DATA(lt_kna1)
+      FOR ALL ENTRIES IN @gt_teminat
+      WHERE kunnr = @gt_teminat-kunnr.
+
+    LOOP AT gt_teminat REFERENCE INTO DATA(grd_teminat).
+      READ TABLE gt_bseg INTO gs_bseg
+        WITH KEY belnr = grd_teminat->belnr
+                 gjahr = grd_teminat->gjahr
+                 bukrs = grd_teminat->bukrs
+                 umskz = grd_teminat->umskz_odk.
+      IF sy-subrc = 0.
+        IF grd_teminat->wrbtr IS NOT INITIAL AND gs_bseg-shkzg = 'H'.
+          CLEAR grd_teminat->wrbtr.
+          grd_teminat->wrbtr = -1 * gs_bseg-wrbtr.
+        ELSEIF gs_bseg-wrbtr IS NOT INITIAL AND gs_bseg-shkzg = 'S'.
+          grd_teminat->wrbtr = gs_bseg-wrbtr.
+        ENDIF.
+
+        IF gs_bseg-dmbtr IS NOT INITIAL AND gs_bseg-shkzg ='H'.
+          CLEAR grd_teminat->dmbtr.
+          grd_teminat->dmbtr = -1 * gs_bseg-dmbtr.
+        ENDIF.
+      ENDIF.
+
+      IF grd_teminat->kunnr IS NOT INITIAL.
+        grd_teminat->name1 = VALUE #( lt_kna1[ kunnr = grd_teminat->kunnr ]-name1 OPTIONAL ).
+      ELSEIF grd_teminat->lifnr IS NOT INITIAL.
+        grd_teminat->name1 = VALUE #( lt_lfa1[ lifnr = grd_teminat->lifnr ]-name1 OPTIONAL ).
+      ENDIF.
+
+    ENDLOOP.
+  ENDIF.
+ENDFORM.                    " F_GET_DATA
+*&---------------------------------------------------------------------*
+*& Form F_STATUS_0100
+*&---------------------------------------------------------------------*
+FORM f_status_0100.
+  SET PF-STATUS '0100'.
+  SET TITLEBAR  '0100'.
+ENDFORM.                    " F_STATUS_0100
+*&---------------------------------------------------------------------*
+*& Form F_EXIT
+*&---------------------------------------------------------------------*
+FORM f_exit.
+  LEAVE TO SCREEN 0.
+ENDFORM.                    " F_EXIT
+*&---------------------------------------------------------------------*
+*& Form F_SHOW_ALV
+*&---------------------------------------------------------------------*
+FORM f_show_alv.
+
+  IF  gg_0100 IS INITIAL.
+    CREATE OBJECT gc_0100
+      EXPORTING
+        container_name = 'CC_0100'.
+
+    CREATE OBJECT gg_0100
+      EXPORTING
+        i_parent = gc_0100.
+
+    PERFORM f_prepare_fldct USING 'ZFI_S_TEMINAT_RAPOR'.
+    PERFORM f_toolbar_exclude.
+
+    CREATE OBJECT gcl_event_receiver.
+    SET HANDLER gcl_event_receiver->handle_toolbar FOR gg_0100.
+    SET HANDLER gcl_event_receiver->handle_user_command FOR gg_0100.
+    SET HANDLER gcl_event_receiver->handle_data_changed_finished FOR gg_0100.
+
+    CALL METHOD gg_0100->set_table_for_first_display
+      EXPORTING
+        it_toolbar_excluding = gt_exclude
+        i_save               = 'A'
+        is_variant           = gs_variant_0100
+        is_layout            = gs_layout_0100
+      CHANGING
+        it_fieldcatalog      = gt_fldct
+        it_outtab            = gt_teminat[].
+  ELSE.
+    PERFORM f_refresh_alv USING gg_0100.
+  ENDIF.
+
+ENDFORM.                    " F_SHOW_ALV
+*&---------------------------------------------------------------------*
+*& Form F_PREPARE_FLDCT
+*&---------------------------------------------------------------------*
+FORM f_prepare_fldct USING u_sname TYPE tabname.
+  DATA ls_fldct LIKE lvc_s_fcat.
+
+  FREE gt_fldct.
+  CLEAR gs_layout_0100.
+
+  gs_layout_0100-zebra      = 'X'.
+  gs_layout_0100-cwidth_opt = 'X'.
+  gs_layout_0100-sel_mode   = 'A'.
+  gs_layout_0100-no_rowins  = 'X'.
+
+  gs_variant_0100-report = sy-repid.
+  gs_variant_0100-handle = '1'.
+
+  CALL FUNCTION 'LVC_FIELDCATALOG_MERGE'
+    EXPORTING
+      i_structure_name       = u_sname
+      i_bypassing_buffer     = 'X'
+    CHANGING
+      ct_fieldcat            = gt_fldct
+    EXCEPTIONS
+      inconsistent_interface = 1
+      program_error          = 2
+      OTHERS                 = 3.
+
+  DEFINE edit.
+    ls_fldct-edit = 'X'.
+  MODIFY gt_fldct FROM ls_fldct TRANSPORTING edit WHERE fieldname EQ &1.
+  END-OF-DEFINITION.
+
+  LOOP AT gt_fldct REFERENCE INTO DATA(lrd_fldct).
+    CASE lrd_fldct->fieldname.
+      WHEN 'DMBTR' OR 'WRBTR_TXT' OR 'WRBTR'.
+        lrd_fldct->no_out = 'X'.
+      WHEN 'BELNR'.
+        IF p_iade EQ 'X'.
+          lrd_fldct->no_out = 'X'.
+        ENDIF.
+      WHEN 'BELNR2'.
+        IF p_iade EQ 'X'.
+          lrd_fldct->no_out = 'X'.
+        ENDIF.
+      WHEN 'KUNNR'.
+        IF p_rdl EQ 'X'.
+          lrd_fldct->no_out = 'X'.
+        ENDIF.
+      WHEN 'LIFNR'.
+        IF p_rdk EQ 'X'.
+          lrd_fldct->no_out = 'X'.
+        ENDIF.
+      WHEN 'TMTUR'.
+        lrd_fldct->seltext = 'Tür'.
+        lrd_fldct->coltext = 'Tür'.
+        lrd_fldct->reptext = 'Tür'.
+      WHEN 'TMTUR2'.
+        lrd_fldct->seltext = 'Tür 2'.
+        lrd_fldct->coltext = 'Tür 2'.
+        lrd_fldct->reptext = 'Tür 2'.
+      WHEN 'STBLG' OR 'IADE_TARIHI'.
+        IF p_tem EQ 'X'.
+          lrd_fldct->no_out = 'X'.
+        ENDIF.
+      WHEN 'BLART2'.
+        IF p_tem EQ 'X'.
+          lrd_fldct->no_out = 'X'.
+        ENDIF.
+      WHEN 'BLART'.
+        IF p_iade EQ 'X'.
+          lrd_fldct->no_out = 'X'.
+        ENDIF.
+      WHEN 'HKONT1'.
+        lrd_fldct->no_out = 'X'.
+      WHEN 'AKTUT_TXT'.
+        lrd_fldct->no_out = 'X'.
+      WHEN 'URUN_TEXT'.
+        IF zfi_teminat-urun_text IS INITIAL.
+          lrd_fldct->no_out = 'X'.
+        ENDIF.
+      WHEN 'BIRIM_TEXT'.
+        IF zfi_teminat-birim_text IS INITIAL.
+          lrd_fldct->no_out = 'X'.
+        ENDIF.
+      WHEN 'VKNMUSTERI'.
+        IF zfi_teminat-vknmusteri IS INITIAL.
+          lrd_fldct->no_out = 'X'.
+        ENDIF.
+      WHEN 'VKNSATICI'.
+        IF zfi_teminat-vknsatici IS INITIAL.
+          lrd_fldct->no_out = 'X'.
+        ENDIF.
+      WHEN OTHERS.
+    ENDCASE.
+  ENDLOOP.
+
+ENDFORM.                    " F_PREPARE_FLDCT
+*&---------------------------------------------------------------------*
+*& Form F_TOOLBAR_EXCLUDE
+*&---------------------------------------------------------------------*
+FORM f_toolbar_exclude.
+  FREE gt_exclude.
+  APPEND cl_gui_alv_grid=>mc_fc_loc_copy_row      TO gt_exclude.
+  APPEND cl_gui_alv_grid=>mc_fc_loc_delete_row    TO gt_exclude.
+  APPEND cl_gui_alv_grid=>mc_fc_loc_append_row    TO gt_exclude.
+  APPEND cl_gui_alv_grid=>mc_fc_loc_insert_row    TO gt_exclude.
+  APPEND cl_gui_alv_grid=>mc_fc_loc_move_row      TO gt_exclude.
+  APPEND cl_gui_alv_grid=>mc_fc_loc_copy          TO gt_exclude.
+  APPEND cl_gui_alv_grid=>mc_fc_loc_cut           TO gt_exclude.
+  APPEND cl_gui_alv_grid=>mc_fc_loc_paste         TO gt_exclude.
+  APPEND cl_gui_alv_grid=>mc_fc_loc_paste_new_row TO gt_exclude.
+  APPEND cl_gui_alv_grid=>mc_fc_loc_undo          TO gt_exclude.
+  APPEND cl_gui_alv_grid=>mc_fc_refresh           TO gt_exclude.
+  APPEND cl_gui_alv_grid=>mc_fc_print             TO gt_exclude.
+  APPEND cl_gui_alv_grid=>mc_fc_info              TO gt_exclude.
+  APPEND cl_gui_alv_grid=>mc_fc_graph             TO gt_exclude.
+ENDFORM.                    " F_TOOLBAR_EXCLUDE
+*&---------------------------------------------------------------------*
+*& Form F_REFRESH_ALV
+*&---------------------------------------------------------------------*
+FORM f_refresh_alv USING u_grid TYPE REF TO cl_gui_alv_grid.
+  DATA : ls_stable TYPE lvc_s_stbl.
+
+  ls_stable-row = 'X'.
+  ls_stable-col = 'X'.
+
+  CALL METHOD u_grid->refresh_table_display
+    EXPORTING
+      is_stable      = ls_stable
+      i_soft_refresh = 'X'
+    EXCEPTIONS
+      finished       = 1
+      OTHERS         = 2.
+ENDFORM.                    " F_REFRESH_ALV
+*&---------------------------------------------------------------------*
+*& Form F4_SEARCH_HELP
+*&---------------------------------------------------------------------*
+FORM f4_search_help.
+
+  DATA : BEGIN OF lt_table OCCURS 0,
+           belt  LIKE zfi_belge_tur-belt,
+           blart LIKE zfi_belge_tur-blart,
+         END OF lt_table.
+
+  DATA : lv_return_tab      TYPE TABLE OF ddshretval,
+         lv_dynpfld_mapping TYPE TABLE OF dselc.
+
+  SELECT belt blart FROM zfi_belge_tur INTO TABLE lt_table.
+
+  CALL FUNCTION 'F4IF_INT_TABLE_VALUE_REQUEST'
+    EXPORTING
+      retfield        = 'ZFI_BELGE_TUR'
+      dynpprog        = sy-repid
+      dynpnr          = sy-dynnr
+      dynprofield     = 'S_BLART'
+      value_org       = 'S'
+    TABLES
+      value_tab       = lt_table
+      return_tab      = lv_return_tab
+      dynpfld_mapping = lv_dynpfld_mapping
+    EXCEPTIONS
+      parameter_error = 1
+      no_values_found = 2
+      OTHERS          = 3.
+
+ENDFORM.                    " F4_SEARCH_HELP
+*&---------------------------------------------------------------------*
+*& Form SELECTION_SCREEN_OUTPUT
+*&---------------------------------------------------------------------*
+FORM selection_screen_output.
+
+  IF p_rdk = 'X'.
+    LOOP AT SCREEN.
+      IF screen-name CS 'S_KUNNR'.
+        screen-active  = 1.
+      ELSEIF screen-name CS 'S_LIFNR'.
+        screen-active  = 0.
+      ENDIF.
+      MODIFY SCREEN.
+    ENDLOOP.
+  ELSE.
+    LOOP AT SCREEN.
+      IF screen-name CS 'S_KUNNR'.
+        screen-active  = 0.
+      ELSEIF screen-name CS 'S_LIFNR'.
+        screen-active  = 1.
+      ENDIF.
+      MODIFY SCREEN.
+    ENDLOOP.
+  ENDIF.
+
+  LOOP AT SCREEN.
+    IF screen-name = 'P_BLART'.
+      IF p_tem = 'X'.
+        p_blart = 'TM'.
+      ELSEIF p_iade = 'X'.
+        p_blart = 'TK'.
+      ENDIF.
+    ENDIF.
+    MODIFY SCREEN.
+  ENDLOOP.
+
+ENDFORM.                    " SELECTION_SCREEN_OUTPUT
+*&---------------------------------------------------------------------*
+*& Form USER_COMMAND_0100
+*&---------------------------------------------------------------------*
+FORM user_command_0100.
+  DATA : lv_ok_0100 TYPE sy-ucomm.
+
+  lv_ok_0100 = gv_ok_0100.
+
+  CLEAR : gv_ok_0100.
+
+  CASE lv_ok_0100.
+    WHEN 'BACK' OR 'CANCEL' OR 'EXIT'.
+      LEAVE TO SCREEN 0.
+  ENDCASE.
+ENDFORM.                    " USER_COMMAND_0100.
+*&---------------------------------------------------------------------*
+*& Form YAZDIR
+*&---------------------------------------------------------------------*
+*FORM yazdir.
+*
+*  DATA: lv_fname        TYPE funcname,
+*        ls_outputparams TYPE sfpoutputparams,
+*        ls_docparams    TYPE sfpdocparams,
+*        lv_fpname       TYPE fpname.
+*
+*  CLEAR: gt_form[].
+*
+*  gg_0100->get_selected_rows( IMPORTING et_row_no = DATA(lt_roid) ).
+*
+*  IF lines( lt_roid[] ) IS INITIAL.
+*    MESSAGE TEXT-002 TYPE 'S' DISPLAY LIKE 'E'.
+*    RETURN.
+*  ELSE.
+*    LOOP AT lt_roid REFERENCE INTO DATA(lrd_roid).
+*      APPEND INITIAL LINE TO gt_form REFERENCE INTO DATA(grd_form).
+*      READ TABLE gt_teminat REFERENCE INTO DATA(grd_teminat) INDEX lrd_roid->row_id.
+*      IF sy-subrc EQ 0.
+*        MOVE-CORRESPONDING grd_teminat->* TO grd_form->*.
+*        WRITE grd_form->aktut TO grd_form->aktut_txt UNIT grd_form->waers.
+*        CONDENSE grd_form->aktut_txt.
+*      ENDIF.
+*    ENDLOOP.
+*  ENDIF.
+*
+*  IF p_tem EQ 'X'.
+*    lv_fpname = c_fpname.
+*  ELSEIF p_iade EQ 'X'.
+*    lv_fpname = c_fpname_iade.
+*  ENDIF.
+*
+*** Adobe FORM çıktısı...
+*  ls_outputparams-dest = 'LP01'.
+*
+*  CALL FUNCTION 'FP_JOB_OPEN'
+*    CHANGING
+*      ie_outputparams = ls_outputparams
+*    EXCEPTIONS
+*      cancel          = 1
+*      usage_error     = 2
+*      system_error    = 3
+*      internal_error  = 4
+*      OTHERS          = 5.
+*  IF sy-subrc <> 0.
+*  ENDIF.
+*
+*  CALL FUNCTION 'FP_FUNCTION_MODULE_NAME'
+*    EXPORTING
+*      i_name     = lv_fpname
+*    IMPORTING
+*      e_funcname = lv_fname.
+*  IF sy-subrc <> 0.
+*  ENDIF.
+*
+*  CALL FUNCTION lv_fname
+*    EXPORTING
+*      iv_datum       = sy-datum
+*      it_form        = gt_form
+*    EXCEPTIONS
+*      usage_error    = 1
+*      system_error   = 2
+*      internal_error = 3.
+*
+*  CALL FUNCTION 'FP_JOB_CLOSE'
+*    EXCEPTIONS
+*      usage_error    = 1
+*      system_error   = 2
+*      internal_error = 3
+*      OTHERS         = 4.
+*  IF sy-subrc <> 0.
+*  ENDIF.
+*
+*ENDFORM.                    " YAZDIR 

@@ -1,0 +1,21 @@
+REPORT zfi_p_komisyon.
+
+INCLUDE : zfi_p_komisyon_i_top,
+          zfi_p_komisyon_i_cls,
+          zfi_p_komisyon_i_mdl.
+
+INITIALIZATION.
+  lcl_main=>initialization( ).
+  SELECTION-SCREEN FUNCTION KEY 1.
+
+AT SELECTION-SCREEN OUTPUT.
+  lcl_main=>selection_screen_output( ).
+
+AT SELECTION-SCREEN.
+  lcl_main=>selection_screen( ).
+
+START-OF-SELECTION.
+  lcl_main=>start_of_selection( ).
+
+END-OF-SELECTION.
+  lcl_main=>end_of_selection( ). 

@@ -1,0 +1,74 @@
+*&---------------------------------------------------------------------*
+*& Include   ZFI_R_I_TEMINAT_CLASS                                     *
+*&---------------------------------------------------------------------*
+CLASS cl_event_receiver DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS :
+      handle_toolbar FOR EVENT toolbar OF cl_gui_alv_grid
+        IMPORTING e_object e_interactive,  "butonlar için
+
+      handle_user_command
+      FOR EVENT user_command OF cl_gui_alv_grid
+
+        IMPORTING e_ucomm,
+      handle_data_changed_finished
+                    FOR EVENT data_changed_finished OF cl_gui_alv_grid
+        IMPORTING e_modified et_good_cells.  "edit yazılanlar için
+
+ENDCLASS.
+CLASS cl_event_receiver IMPLEMENTATION.
+  METHOD handle_toolbar.
+*    DATA: ls_toolbar TYPE stb_button.
+*
+*    CLEAR ls_toolbar.
+*    MOVE icon_print TO ls_toolbar-icon.
+*    MOVE 'YAZDIR'   TO ls_toolbar-function.
+*    MOVE 'Yazdır'   TO ls_toolbar-quickinfo.
+*    MOVE 'Yazdır'   TO ls_toolbar-text.
+*    INSERT ls_toolbar INTO e_object->mt_toolbar INDEX 20. "btn başa ekler
+  ENDMETHOD.
+  METHOD handle_user_command.
+*    CASE e_ucomm.
+*      WHEN 'YAZDIR'.
+*        PERFORM yazdir.
+*    ENDCASE.
+  ENDMETHOD.
+  METHOD handle_data_changed_finished.
+
+    DATA : ls_modify TYPE lvc_s_modi,
+           lv_text   TYPE text100.
+
+    LOOP AT et_good_cells INTO ls_modify.
+      READ TABLE gt_teminat INTO gs_teminat INDEX ls_modify-row_id.
+    ENDLOOP.
+
+  ENDMETHOD.
+ENDCLASS.
+
+DATA: gcl_event_receiver TYPE REF TO cl_event_receiver.
+
+
+**********************************************************************
+
+*&---------------------------------------------------------------------*
+*& Include   ZFI_R_I_TEMINAT_PBO                                       *
+*&---------------------------------------------------------------------*
+MODULE status_0100 OUTPUT.
+  PERFORM f_status_0100.
+  PERFORM f_show_alv.
+ENDMODULE.
+
+**********************************************************************
+
+*&---------------------------------------------------------------------*
+*& Include   ZFI_R_I_TEMINAT_PAI                                       *
+*&---------------------------------------------------------------------*
+MODULE exit INPUT.
+  PERFORM f_exit.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0100  INPUT
+*&---------------------------------------------------------------------*
+MODULE user_command_0100 INPUT.
+  PERFORM user_command_0100.
+ENDMODULE.
