@@ -1,18 +1,18 @@
 # sap-teminat-mektubu-project
-Kullanılan Teknolojiler
-Teminat Mektubu  Project
-Kullanılan Teknolojiler
-SAP ERP
-ABAP
-SAP FI Modülü
-ALV Grid
-Dialog Programming
-BAPI
-Custom Z Tables
-Selection Screen
-Function Module
-Object-Oriented ABAP
-Proje Modülleri
+Kullanılan Teknolojiler;
+Teminat Mektubu  Project,
+Kullanılan Teknolojiler,
+SAP ERP,
+ABAP,
+SAP FI Modülü,
+ALV Grid,
+Dialog Programming,
+BAPI,
+Custom Z Tables,
+Selection Screen,
+Function Module,
+Object-Oriented ABAP,
+Proje Modülleri.
 1. Teminat Mektubu Programı
 
 Teminat mektubu ana programı, kullanıcıların alınan ve verilen teminat mektuplarını yönetebilmesi amacıyla geliştirilmiştir. Program içerisinde belge oluşturma, belge görüntüleme, iade işlemi, vade değişikliği, dosya yükleme, belge yazdırma ve komisyon ekranına geçiş gibi işlemler bulunmaktadır.
